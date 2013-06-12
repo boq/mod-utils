@@ -23,11 +23,13 @@ public class SerializableData implements ISerializableData {
         public final Field field;
         public final IFieldSerializer serializer;
         public final boolean isNullable;
+        public final int flags;
 
-        public FieldEntry(Field field, IFieldSerializer serializer, boolean isNullable) {
+        public FieldEntry(Field field, IFieldSerializer serializer, boolean isNullable, int flags) {
             this.field = field;
             this.serializer = serializer;
             this.isNullable = isNullable;
+            this.flags = flags;
         }
     }
 
@@ -68,12 +70,13 @@ public class SerializableData implements ISerializableData {
 
             if (ann != null) {
                 boolean isNullable = ann.nullable();
+                int flags = ann.flags();
 
                 Class<? extends IFieldSerializerFactory> factoryCls = ann.serializer();
                 IFieldSerializerFactory factory = getFactory(factoryCls);
                 IFieldSerializer serializer = factory.getSerializer(field, isNullable);
                 field.setAccessible(true);
-                FieldEntry entry = new FieldEntry(field, serializer, isNullable);
+                FieldEntry entry = new FieldEntry(field, serializer, isNullable, flags);
                 tmp.add(entry);
             }
         }
@@ -83,14 +86,15 @@ public class SerializableData implements ISerializableData {
         return result;
     }
 
-    private void visitFields(FieldVisitor visitor) {
+    private void visitFields(int mask, FieldVisitor visitor) {
         for (FieldEntry e : getEntryList(getClass()))
-            visitor.visitField(e.field, e.serializer, e.isNullable);
+            if ((e.flags & mask) == mask)
+                visitor.visitField(e.field, e.serializer, e.isNullable);
     }
 
     @Override
     public void writeToNBT(final NBTTagCompound tag) {
-        visitFields(new FieldVisitor() {
+        visitFields(SerializableField.NBT_SERIALIZABLE, new FieldVisitor() {
             @Override
             public void visitField(Field field, IFieldSerializer serializer, boolean isNullable) {
                 serializer.writeToNBT(SerializableData.this, field, tag, isNullable);
@@ -100,7 +104,7 @@ public class SerializableData implements ISerializableData {
 
     @Override
     public void readFromNBT(final NBTTagCompound tag) {
-        visitFields(new FieldVisitor() {
+        visitFields(SerializableField.NBT_SERIALIZABLE, new FieldVisitor() {
             @Override
             public void visitField(Field field, IFieldSerializer serializer, boolean isNullable) {
                 serializer.readFromNBT(SerializableData.this, field, tag, isNullable);
@@ -110,7 +114,7 @@ public class SerializableData implements ISerializableData {
 
     @Override
     public void writeToStream(final DataOutput output) {
-        visitFields(new FieldVisitor() {
+        visitFields(SerializableField.STREAM_SERIALIZABLE, new FieldVisitor() {
             @Override
             public void visitField(Field field, IFieldSerializer serializer, boolean isNullable) {
                 try {
@@ -124,7 +128,7 @@ public class SerializableData implements ISerializableData {
 
     @Override
     public void readFromStream(final DataInput input) {
-        visitFields(new FieldVisitor() {
+        visitFields(SerializableField.STREAM_SERIALIZABLE, new FieldVisitor() {
             @Override
             public void visitField(Field field, IFieldSerializer serializer, boolean isNullable) {
                 try {
