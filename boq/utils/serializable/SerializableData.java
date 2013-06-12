@@ -9,13 +9,13 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import com.google.common.collect.*;
 
-public class SerializableData implements ISerializableData {
+public class SerializableData implements ISerializableData, ISelectableSerializableData {
 
     private static ClassToInstanceMap<IFieldSerializerFactory> factories = MutableClassToInstanceMap.create();
 
     private static Map<Class<?>, FieldEntry[]> serializers = Maps.newIdentityHashMap();
 
-    private interface FieldVisitor {
+    private interface IFieldVisitor {
         public void visitField(Field field, IFieldSerializer serializer, boolean isNullable);
     }
 
@@ -86,15 +86,15 @@ public class SerializableData implements ISerializableData {
         return result;
     }
 
-    private void visitFields(int mask, FieldVisitor visitor) {
+    private void visitFields(IFieldSelector selector, IFieldVisitor visitor) {
         for (FieldEntry e : getEntryList(getClass()))
-            if ((e.flags & mask) == mask)
+            if (selector.canVisit(e.field, e.flags))
                 visitor.visitField(e.field, e.serializer, e.isNullable);
     }
 
     @Override
-    public void writeToNBT(final NBTTagCompound tag) {
-        visitFields(SerializableField.NBT_SERIALIZABLE, new FieldVisitor() {
+    public void writeToNBT(final NBTTagCompound tag, IFieldSelector selector) {
+        visitFields(selector, new IFieldVisitor() {
             @Override
             public void visitField(Field field, IFieldSerializer serializer, boolean isNullable) {
                 serializer.writeToNBT(SerializableData.this, field, tag, isNullable);
@@ -103,8 +103,8 @@ public class SerializableData implements ISerializableData {
     }
 
     @Override
-    public void readFromNBT(final NBTTagCompound tag) {
-        visitFields(SerializableField.NBT_SERIALIZABLE, new FieldVisitor() {
+    public void readFromNBT(final NBTTagCompound tag, IFieldSelector selector) {
+        visitFields(selector, new IFieldVisitor() {
             @Override
             public void visitField(Field field, IFieldSerializer serializer, boolean isNullable) {
                 serializer.readFromNBT(SerializableData.this, field, tag, isNullable);
@@ -113,8 +113,8 @@ public class SerializableData implements ISerializableData {
     }
 
     @Override
-    public void writeToStream(final DataOutput output) {
-        visitFields(SerializableField.STREAM_SERIALIZABLE, new FieldVisitor() {
+    public void writeToStream(final DataOutput output, IFieldSelector selector) {
+        visitFields(selector, new IFieldVisitor() {
             @Override
             public void visitField(Field field, IFieldSerializer serializer, boolean isNullable) {
                 try {
@@ -127,8 +127,8 @@ public class SerializableData implements ISerializableData {
     }
 
     @Override
-    public void readFromStream(final DataInput input) {
-        visitFields(SerializableField.STREAM_SERIALIZABLE, new FieldVisitor() {
+    public void readFromStream(final DataInput input, IFieldSelector selector) {
+        visitFields(selector, new IFieldVisitor() {
             @Override
             public void visitField(Field field, IFieldSerializer serializer, boolean isNullable) {
                 try {
@@ -138,6 +138,40 @@ public class SerializableData implements ISerializableData {
                 }
             }
         });
+    }
+
+    private final static IFieldSelector nbtSelector = new IFieldSelector() {
+        @Override
+        public boolean canVisit(Field field, int mask) {
+            return (mask & SerializableField.NBT_SERIALIZABLE) != 0;
+        }
+    };
+
+    private final static IFieldSelector streamSelector = new IFieldSelector() {
+        @Override
+        public boolean canVisit(Field field, int mask) {
+            return (mask & SerializableField.STREAM_SERIALIZABLE) != 0;
+        }
+    };
+
+    @Override
+    public void writeToNBT(NBTTagCompound tag) {
+        writeToNBT(tag, nbtSelector);
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        readFromNBT(tag, nbtSelector);
+    }
+
+    @Override
+    public void writeToStream(DataOutput output) {
+        writeToStream(output, streamSelector);
+    }
+
+    @Override
+    public void readFromStream(DataInput input) {
+        readFromStream(input, streamSelector);
     }
 
 }
