@@ -34,8 +34,8 @@ public class BoundsRotator {
         bounds.correct();
     }
 
-    // rotate clockwise around Z axis, R0 - +X, +Y
-    public static void rotate(Bounds b, Rotation rotation) {
+    // rotate bounds in [1,1,1] cube, with center in [0,0,0] clockwise around Z axis, R0 - +X, +Y
+    public static void rotateInBox(Bounds b, Rotation rotation) {
         switch (rotation) {
             case R0:
                 break;
@@ -51,7 +51,7 @@ public class BoundsRotator {
         }
     }
 
-    public static void rotate(Bounds b, ForgeDirection direction) {
+    public static void rotateInBox(Bounds b, ForgeDirection direction) {
         switch (direction) {
             case SOUTH:
                 break;
@@ -72,6 +72,33 @@ public class BoundsRotator {
                 break;
             case UNKNOWN:
                 throw new IllegalArgumentException();
+        }
+    }
+
+    // mirror bounds around center, initial position - south
+    public static void flipDirection(Bounds b, ForgeDirection direction) {
+        switch (direction) {
+            case SOUTH:
+                break;
+            case NORTH:
+                b.minZ = -b.minZ;
+                b.maxZ = -b.maxZ;
+                b.correct();
+                break;
+            case EAST:
+                rotY(b, +b.minZ, b.minX, +b.maxZ, b.maxX);
+                break;
+            case WEST:
+                rotY(b, -b.minZ, b.minX, -b.maxZ, b.maxX);
+                break;
+            case UP:
+                rotX(b, +b.minZ, b.minY, +b.maxZ, b.maxY);
+                break;
+            case DOWN:
+                rotX(b, -b.minZ, b.minY, -b.maxZ, b.maxY);
+                break;
+            default:
+                break;
         }
     }
 

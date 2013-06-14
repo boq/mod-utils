@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.Icon;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
@@ -138,10 +139,17 @@ public final class BoxHelper {
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, i1, j1);
     }
 
+    public static void setLightmapForEntity(Entity entity) {
+        int l = entity.getBrightnessForRender(0);
+        int i1 = l % 65536;
+        int j1 = l / 65536;
+        OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, i1, j1);
+    }
+
     public static void setColor(int color) {
         byte red = (byte)(color >> 16);
         byte green = (byte)(color >> 8);
         byte blue = (byte)(color);
-        GL11.glColor3ub(red, green, blue);
+        GL11.glColor4ub(red, green, blue, (byte)255);
     }
 }

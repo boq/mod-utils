@@ -99,8 +99,30 @@ public class Bounds {
         return Vec3.createVectorHelper((maxX + minX) / 2.0, (maxY + minY) / 2.0, (maxZ + minZ) / 2.0);
     }
 
-    public AxisAlignedBB toAABB(int x, int y, int z) {
+    public AxisAlignedBB getAabbFromPool(int x, int y, int z) {
         return AxisAlignedBB.getAABBPool().getAABB(x + minX, y + minY, z + minZ, x + maxX, y + maxY, z + maxZ);
+    }
+
+    public AxisAlignedBB getAabbFromPool(double x, double y, double z) {
+        return AxisAlignedBB.getAABBPool().getAABB(x + minX, y + minY, z + minZ, x + maxX, y + maxY, z + maxZ);
+    }
+
+    public AxisAlignedBB createAABB(int x, int y, int z) {
+        return AxisAlignedBB.getBoundingBox(x + minX, y + minY, z + minZ, x + maxX, y + maxY, z + maxZ);
+    }
+
+    public AxisAlignedBB createAABB(double x, double y, double z) {
+        return AxisAlignedBB.getBoundingBox(x + minX, y + minY, z + minZ, x + maxX, y + maxY, z + maxZ);
+    }
+
+    public void setAABB(AxisAlignedBB aabb, double x, double y, double z) {
+        aabb.minX = x + minX;
+        aabb.minY = y + minY;
+        aabb.minZ = z + minZ;
+
+        aabb.maxX = x + maxX;
+        aabb.maxY = y + maxY;
+        aabb.maxZ = z + maxZ;
     }
 
     @Override
