@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 import boq.utils.log.Log;
 import boq.utils.misc.Rotation;
 
-public class RotationHelper {
+public class SideRotationHelper {
 
     public static void setupSide(ForgeDirection side) {
         switch (side) {
@@ -34,7 +34,7 @@ public class RotationHelper {
                 GL11.glTranslatef(0, 0, -1);
                 break;
             default:
-                Log.warning("Invalid side while rendering @ RenderHelper.setupSide");
+                Log.warning("Invalid side while rendering @ RenderHelper.SideRotationHelper");
                 break;
         }
     }
