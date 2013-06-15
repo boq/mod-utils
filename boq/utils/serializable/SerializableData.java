@@ -140,14 +140,14 @@ public class SerializableData implements ISerializableData, ISelectableSerializa
         });
     }
 
-    private final static IFieldSelector nbtSelector = new IFieldSelector() {
+    final static IFieldSelector nbtSelector = new IFieldSelector() {
         @Override
         public boolean canVisit(Field field, int mask) {
             return (mask & SerializableField.NBT_SERIALIZABLE) != 0;
         }
     };
 
-    private final static IFieldSelector streamSelector = new IFieldSelector() {
+    final static IFieldSelector streamSelector = new IFieldSelector() {
         @Override
         public boolean canVisit(Field field, int mask) {
             return (mask & SerializableField.STREAM_SERIALIZABLE) != 0;

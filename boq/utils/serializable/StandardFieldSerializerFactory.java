@@ -4,8 +4,10 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.util.Map;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import boq.utils.log.Log;
+import boq.utils.net.StreamHelper;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -28,7 +30,7 @@ public class StandardFieldSerializerFactory implements IFieldSerializerFactory {
         }
     }
 
-    private static abstract class ValueSerializer<T> implements IFieldSerializer {
+    static abstract class ValueSerializer<T> implements IFieldSerializer {
         public abstract T getDefaultValue();
 
         @Override
@@ -128,7 +130,7 @@ public class StandardFieldSerializerFactory implements IFieldSerializerFactory {
         }
     };
 
-    private final IFieldSerializer boolSerializer = new ValueSerializer<Boolean>() {
+    private final static IFieldSerializer boolSerializer = new ValueSerializer<Boolean>() {
 
         @Override
         public void writeToStream(Boolean value, DataOutput output) throws IOException {
@@ -157,7 +159,7 @@ public class StandardFieldSerializerFactory implements IFieldSerializerFactory {
 
     };
 
-    private final IFieldSerializer floatSerializer = new ValueSerializer<Float>() {
+    private final static IFieldSerializer floatSerializer = new ValueSerializer<Float>() {
 
         @Override
         public void writeToStream(Float value, DataOutput output) throws IOException {
@@ -185,7 +187,7 @@ public class StandardFieldSerializerFactory implements IFieldSerializerFactory {
         }
     };
 
-    private final IFieldSerializer doubleSerializer = new ValueSerializer<Double>() {
+    private final static IFieldSerializer doubleSerializer = new ValueSerializer<Double>() {
 
         @Override
         public void writeToStream(Double value, DataOutput output) throws IOException {
@@ -214,7 +216,7 @@ public class StandardFieldSerializerFactory implements IFieldSerializerFactory {
 
     };
 
-    private final IFieldSerializer stringSerializer = new ValueSerializer<String>() {
+    private final static IFieldSerializer stringSerializer = new ValueSerializer<String>() {
 
         @Override
         public void writeToStream(String value, DataOutput output) throws IOException {
@@ -241,6 +243,37 @@ public class StandardFieldSerializerFactory implements IFieldSerializerFactory {
             return "";
         }
 
+    };
+
+    private final static IFieldSerializer itemStackSerializer = new ValueSerializer<ItemStack>() {
+
+        @Override
+        public ItemStack getDefaultValue() {
+            return null;
+        }
+
+        @Override
+        public void writeToStream(final ItemStack stack, DataOutput output) throws IOException {
+            StreamHelper.writeItemStack(stack, output, true);
+        }
+
+        @Override
+        public ItemStack readFromStream(DataInput input) throws IOException {
+            return StreamHelper.readItemStack(input, true);
+        }
+
+        @Override
+        public void writeToNBT(String fieldName, ItemStack value, NBTTagCompound tag) {
+            NBTTagCompound item = new NBTTagCompound();
+            value.writeToNBT(item);
+            tag.setTag(fieldName, item);
+        }
+
+        @Override
+        public ItemStack readFromNBT(String fieldName, NBTTagCompound tag) {
+            NBTTagCompound item = tag.getCompoundTag(fieldName);
+            return ItemStack.loadItemStackFromNBT(item);
+        }
     };
 
     private static class EnumSerializer extends ValueSerializer<Enum<?>> {
@@ -296,6 +329,8 @@ public class StandardFieldSerializerFactory implements IFieldSerializerFactory {
             return floatSerializer;
         else if (fieldCls == Double.class || fieldCls == double.class)
             return doubleSerializer;
+        else if (fieldCls == ItemStack.class)
+            return itemStackSerializer;
         else if (fieldCls.isEnum()) {
             @SuppressWarnings("unchecked")
             Class<Enum<?>> enumCls = (Class<Enum<?>>)fieldCls;
