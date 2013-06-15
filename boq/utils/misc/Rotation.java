@@ -34,4 +34,34 @@ public enum Rotation {
                 throw new RuntimeException("Invalid enum value");
         }
     }
+
+    public Rotation rotateCW() {
+        switch (this) {
+            case R0:
+                return R90;
+            case R90:
+                return R180;
+            case R180:
+                return R270;
+            case R270:
+                return R0;
+            default:
+                throw new RuntimeException("Invalid enum value");
+        }
+    }
+
+    public Rotation rotateCCW() {
+        switch (this) {
+            case R0:
+                return R270;
+            case R90:
+                return R0;
+            case R180:
+                return R90;
+            case R270:
+                return R180;
+            default:
+                throw new RuntimeException("Invalid enum value");
+        }
+    }
 }
