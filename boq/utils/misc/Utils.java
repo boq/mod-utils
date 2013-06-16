@@ -22,4 +22,15 @@ public class Utils {
         item.motionZ = RANDOM.nextGaussian() * f3;
         world.spawnEntityInWorld(item);
     }
+
+    public static Object[] wrap(Object... args) {
+        return args;
+    }
+
+    public static int toInt(Object obj) {
+        return ((Number)obj).intValue();
+    }
+
+    public final static Object[] FALSE = wrap(false);
+    public final static Object[] TRUE = wrap(true);
 }
