@@ -7,6 +7,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
+import com.google.common.base.Preconditions;
+
 public class Utils {
     public static final Random RANDOM = new Random();
 
@@ -28,9 +30,18 @@ public class Utils {
     }
 
     public static int toInt(Object obj) {
-        return ((Number)obj).intValue();
+        Preconditions.checkNotNull(obj, "Expected number but got null");
+
+        if (obj instanceof Number)
+            return ((Number)obj).intValue();
+
+        return Integer.parseInt(obj.toString());
     }
 
     public final static Object[] FALSE = wrap(false);
     public final static Object[] TRUE = wrap(true);
+
+    public static boolean checkArg(Object[] args, int pos) {
+        return args.length > pos && args[pos] != null;
+    }
 }
