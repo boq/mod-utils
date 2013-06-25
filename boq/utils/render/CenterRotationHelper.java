@@ -12,21 +12,21 @@ public class CenterRotationHelper {
     public static void setupSide(ForgeDirection side) {
         switch (side) {
             case UP:
-                GL11.glRotated(-90, 1, 0, 0);
+                GL11.glRotatef(-90, 1, 0, 0);
                 break;
             case DOWN:
-                GL11.glRotated(90, 1, 0, 0);
+                GL11.glRotatef(90, 1, 0, 0);
                 break;
             case NORTH:
-                GL11.glRotated(180, 0, 1, 0);
+                GL11.glRotatef(180, 0, 1, 0);
                 break;
             case SOUTH:
                 break;
             case EAST:
-                GL11.glRotated(90, 0, 1, 0);
+                GL11.glRotatef(90, 0, 1, 0);
                 break;
             case WEST:
-                GL11.glRotated(-90, 0, 1, 0);
+                GL11.glRotatef(-90, 0, 1, 0);
                 break;
             default:
                 Log.warning("Invalid side while rendering @ RenderHelper.CenterRotationHelper");
@@ -39,13 +39,13 @@ public class CenterRotationHelper {
             case R0:
                 break;
             case R90:
-                GL11.glRotated(90, 0, 0, 1);
+                GL11.glRotatef(90, 0, 0, 1);
                 break;
             case R180:
-                GL11.glRotated(180, 0, 0, 1);
+                GL11.glRotatef(180, 0, 0, 1);
                 break;
             case R270:
-                GL11.glRotated(270, 0, 0, 1);
+                GL11.glRotatef(270, 0, 0, 1);
                 break;
         }
     }
