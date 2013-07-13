@@ -2,6 +2,7 @@ package boq.utils.lang;
 
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
+@Deprecated
 public final class LangList {
     private LangList() {}
 

@@ -8,7 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
-import net.minecraftforge.liquids.LiquidStack;
+import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fluids.FluidStack;
 import boq.utils.net.BlockHelper.DataBlockReader;
 import boq.utils.net.BlockHelper.DataBlockWriter;
 
@@ -73,17 +74,42 @@ public final class StreamHelper {
             writeNullBlock(output);
     }
 
-    public static LiquidStack readLiquidStack(DataInput input) throws IOException {
-        int itemId = input.readShort();
-        int amount = input.readInt();
-        int itemMeta = input.readShort();
-        return new LiquidStack(itemId, amount, itemMeta);
+    public static FluidStack readFluidStack(DataInput input, boolean compressed) throws IOException {
+        return readBlock(input, compressed, new DataBlockReader<FluidStack>() {
+
+            @Override
+            public FluidStack read(DataInput input) throws IOException {
+                String fluidName = input.readUTF();
+                int amount = input.readInt();
+
+                int fluidId = FluidRegistry.getFluidID(fluidName);
+
+                FluidStack stack = new FluidStack(fluidId, amount);
+
+                boolean hasTag = input.readBoolean();
+                if (hasTag)
+                    stack.tag = (NBTTagCompound)NBTBase.readNamedTag(input);
+                return stack;
+            }
+        });
     }
 
-    public static void writeLiquidStack(LiquidStack stack, DataOutput output) throws IOException {
-        output.writeShort(stack.itemID);
-        output.writeInt(stack.amount);
-        output.writeShort(stack.itemMeta);
+    public static void writeLiquidStack(final FluidStack stack, DataOutput output, boolean compress) throws IOException {
+        if (stack != null)
+            writeBlock(output, compress, new DataBlockWriter() {
+                @Override
+                public void write(DataOutput output) throws IOException {
+                    output.writeUTF(FluidRegistry.getFluidName(stack.fluidID));
+                    output.writeInt(stack.amount);
+
+                    boolean hasTag = stack.tag != null;
+                    output.writeBoolean(hasTag);
+                    if (hasTag)
+                        NBTBase.writeNamedTag(stack.tag, output);
+                }
+            });
+        else
+            writeNullBlock(output);
     }
 
     public static Vec3 readVec3(DataInput input) throws IOException {

@@ -2,8 +2,8 @@ package boq.utils.render;
 
 import java.util.EnumSet;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Icon;
@@ -106,30 +106,6 @@ public final class BoxHelper {
         double ry = vec.yCoord - TileEntityRenderer.staticPlayerY;
         double rz = vec.zCoord - TileEntityRenderer.staticPlayerZ;
         return Vec3.createVectorHelper(rx, ry, rz);
-    }
-
-    public static Icon getBlockIcon(String name) {
-        return getRender().textureMapBlocks.getTextureExtry(name);
-    }
-
-    public static Icon getItemIcon(String name) {
-        return getRender().textureMapItems.getTextureExtry(name);
-    }
-
-    public static RenderEngine getRender() {
-        return Minecraft.getMinecraft().renderEngine;
-    }
-
-    public static void bindItemsTexture() {
-        getRender().bindTexture("/gui/items.png");
-    }
-
-    public static void bindBlocksTexture() {
-        getRender().bindTexture("/terrain.png");
-    }
-
-    public static void bindTexture(String texture) {
-        getRender().bindTexture(texture);
     }
 
     public static void setLightmapForBlock(World world, int x, int y, int z) {
