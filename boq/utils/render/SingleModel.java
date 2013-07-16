@@ -31,4 +31,10 @@ public abstract class SingleModel {
             GL11.glDeleteLists(displayList, 1);
     }
 
+    public void flush() {
+        if (compiled) {
+            GL11.glDeleteLists(displayList, 1);
+            compiled = false;
+        }
+    }
 }

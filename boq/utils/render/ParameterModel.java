@@ -1,7 +1,6 @@
 package boq.utils.render;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import net.minecraft.client.renderer.GLAllocation;
 
@@ -22,7 +21,7 @@ public abstract class ParameterModel<T> {
             compile(param);
             GL11.glEndList();
             GL11.glPopMatrix();
-            lists.put(param, displayList);
+            put(param, displayList);
         }
         GL11.glCallList(displayList);
     }
@@ -31,6 +30,18 @@ public abstract class ParameterModel<T> {
     protected void finalize() throws Throwable {
         for (Integer list : lists.values())
             GL11.glDeleteLists(list, 1);
+    }
+
+    private synchronized void put(T param, int displayList) {
+        lists.put(param, displayList);
+    }
+
+    public synchronized void flush() {
+        Iterator<Integer> it = lists.values().iterator();
+        while (it.hasNext()) {
+            GL11.glDeleteLists(it.next(), 1);
+            it.remove();
+        }
     }
 
 }
