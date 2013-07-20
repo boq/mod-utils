@@ -11,6 +11,8 @@ public @interface SerializableField {
 
     public final static int USER_DEFINED_0 = 1 << 8;
     public final static int USER_DEFINED_1 = 1 << 9;
+    public final static int USER_DEFINED_2 = 1 << 10;
+    public final static int USER_DEFINED_3 = 1 << 11;
 
     public final static int SERIALIZABLE = 3;
 
