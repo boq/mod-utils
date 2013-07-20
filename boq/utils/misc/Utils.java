@@ -2,8 +2,11 @@ package boq.utils.misc;
 
 import java.util.Random;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
@@ -16,12 +19,21 @@ public class Utils {
         dropItem(world, vec.xCoord, vec.yCoord, vec.zCoord, is);
     }
 
-    public static void dropItem(World world, double x, double y, double z, ItemStack is) {
+    public static EntityItem createDrop(Entity dropper, ItemStack is) {
+        return createEntityItem(dropper.worldObj, dropper.posX, dropper.posY, dropper.posZ, is);
+    }
+
+    public static EntityItem createEntityItem(World world, double x, double y, double z, ItemStack is) {
         EntityItem item = new EntityItem(world, x, y, z, is.copy());
         double f3 = 0.05;
         item.motionX = RANDOM.nextGaussian() * f3;
         item.motionY = RANDOM.nextGaussian() * f3 + 0.2;
         item.motionZ = RANDOM.nextGaussian() * f3;
+        return item;
+    }
+
+    public static void dropItem(World world, double x, double y, double z, ItemStack is) {
+        EntityItem item = createEntityItem(world, x, y, z, is);
         world.spawnEntityInWorld(item);
     }
 
@@ -43,5 +55,11 @@ public class Utils {
 
     public static boolean checkArg(Object[] args, int pos) {
         return args.length > pos && args[pos] != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends NBTBase> T getTag(NBTTagCompound tag, String key) {
+        NBTBase t = tag.getTag(key);
+        return (T)t;
     }
 }
