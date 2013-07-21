@@ -14,12 +14,12 @@ public class InventoryUtils {
     }
 
     public static boolean canInsertItemToInventory(IInventory inventory, ItemStack stack, int slot) {
-        return inventory.isItemValidForSlot(slot, stack);
+        return inventory.isStackValidForSlot(slot, stack);
     }
 
     public static boolean canInsertItemToInventory(ISidedInventory inventory, ItemStack stack, int slot, ForgeDirection side) {
         return inventory.canInsertItem(slot, stack, side.ordinal()) &&
-                inventory.isItemValidForSlot(slot, stack);
+                inventory.isStackValidForSlot(slot, stack);
     }
 
     private static ItemStack insertStackIntoSlot(IInventory inventory, ItemStack stack, int slot) {

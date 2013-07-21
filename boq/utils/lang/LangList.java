@@ -12,9 +12,9 @@ public final class LangList {
             this.lang = lang;
         }
 
-        public void load(String resourcePrefix) {
-            String fileName = resourcePrefix + lang + ".xml";
-            LanguageRegistry.instance().loadLocalization(fileName, lang, true);
+        public void load(String resourcePrefix, boolean isXml) {
+            String fileName = resourcePrefix + lang + (isXml ? ".xml" : ".lang");
+            LanguageRegistry.instance().loadLocalization(fileName, lang, isXml);
         }
     }
 
@@ -22,9 +22,9 @@ public final class LangList {
             new Lang("en_US")
     };
 
-    public static void loadAll(String resourcePrefix) {
+    public static void loadAll(String resourcePrefix, boolean isXml) {
         for (Lang l : languages)
-            l.load(resourcePrefix);
+            l.load(resourcePrefix, isXml);
     }
 
 }
