@@ -62,4 +62,15 @@ public class Utils {
         NBTBase t = tag.getTag(key);
         return (T)t;
     }
+
+    public static NBTTagCompound getItemTag(ItemStack stack) {
+        NBTTagCompound result = stack.getTagCompound();
+
+        if (result == null) {
+            result = new NBTTagCompound("tag");
+            stack.setTagCompound(result);
+        }
+
+        return result;
+    }
 }
